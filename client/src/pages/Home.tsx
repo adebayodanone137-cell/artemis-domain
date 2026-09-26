@@ -54,23 +54,16 @@ function ServiceIcon({ icon: Icon, color }: { icon: typeof Monitor; color: strin
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const reveal = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add("is-visible")), { threshold: .12 });
     document.querySelectorAll(".reveal").forEach((element) => reveal.observe(element));
     const onScroll = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", onScroll, { passive: true });
-    const loaderTimer = window.setTimeout(() => setIsLoading(false), 760);
-    return () => { reveal.disconnect(); window.removeEventListener("scroll", onScroll); window.clearTimeout(loaderTimer); };
+    return () => { reveal.disconnect(); window.removeEventListener("scroll", onScroll); };
   }, []);
   const closeMenu = () => setMenuOpen(false);
 
   return <div className="studio-shell">
-    <div className={`site-loader ${isLoading ? "is-active" : "is-done"}`} aria-hidden={!isLoading}>
-      <div className="loader-brand"><span>✦</span> ARTEMIS DOMAIN</div>
-      <div className="loader-progress"><i /></div>
-      <span className="loader-status">INITIALIZING CREATIVE SYSTEM <b> / 100</b></span>
-    </div>
     <header className={`floating-nav ${scrolled ? "scrolled" : ""}`}>
       <a href="#home" className="studio-logo" onClick={closeMenu}><span>✦</span> ARTEMIS DOMAIN</a>
       <nav className={menuOpen ? "open" : ""}>
