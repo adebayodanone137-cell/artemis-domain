@@ -7,10 +7,13 @@ import {
   Github,
   Layers3,
   Menu,
+  MessageCircle,
   Monitor,
   Palette,
   Play,
   Sparkles,
+  Moon,
+  Sun,
   Video,
   X,
   Youtube,
@@ -20,6 +23,11 @@ const socials = [
   { label: "YOUTUBE", handle: "@Artemis_vfx-b8d", href: "https://www.youtube.com/@Artemis_vfx-b8d", icon: Youtube, color: "purple" },
   { label: "TIKTOK", handle: "@artemis1_vfx", href: "https://www.tiktok.com/@artemis1_vfx", icon: Play, color: "blue" },
   { label: "GITHUB", handle: "adebayodanone137-cell", href: "https://github.com/adebayodanone137-cell", icon: Github, color: "cyan" },
+];
+
+const whatsappContacts = [
+  { label: "WHATSAPP QR CONTACT", handle: "Scan or tap to start a chat", href: "https://wa.me/qr/3R76ORN6ZPAPI1", icon: MessageCircle, color: "whatsapp-green", qr: true },
+  { label: "WHATSAPP DIRECT", handle: "+234 707 947 3861", href: "https://wa.me/2347079473861", icon: MessageCircle, color: "whatsapp-blue" },
 ];
 
 const services = [
@@ -54,6 +62,7 @@ function ServiceIcon({ icon: Icon, color }: { icon: typeof Monitor; color: strin
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">(() => window.localStorage.getItem("artemis-theme") === "dark" ? "dark" : "light");
   useEffect(() => {
     const reveal = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add("is-visible")), { threshold: .12 });
     document.querySelectorAll(".reveal").forEach((element) => reveal.observe(element));
@@ -61,6 +70,11 @@ export default function Home() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => { reveal.disconnect(); window.removeEventListener("scroll", onScroll); };
   }, []);
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    window.localStorage.setItem("artemis-theme", theme);
+  }, [theme]);
   const closeMenu = () => setMenuOpen(false);
 
   return <div className="studio-shell">
@@ -69,6 +83,10 @@ export default function Home() {
       <nav className={menuOpen ? "open" : ""}>
         {["HOME", "ABOUT", "SERVICES", "WORK", "CONTACT"].map((item) => <a key={item} href={`#${item.toLowerCase()}`} onClick={closeMenu}>{item}</a>)}
       </nav>
+      <div className="theme-switch" role="group" aria-label="Choose color theme">
+        <button type="button" className={theme === "light" ? "active" : ""} aria-pressed={theme === "light"} onClick={() => setTheme("light")}><Sun size={13} /> LIGHT</button>
+        <button type="button" className={theme === "dark" ? "active" : ""} aria-pressed={theme === "dark"} onClick={() => setTheme("dark")}><Moon size={13} /> DARK</button>
+      </div>
       <a href="#contact" className="talk-button">LET'S TALK <ArrowUpRight size={14} /></a>
       <button className="mobile-toggle" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={19} /> : <Menu size={19} />}</button>
     </header>
@@ -93,11 +111,11 @@ export default function Home() {
 
       <section className="why section-light"><div className="section-top reveal"><span>06 / WHY ARTEMIS?</span><span>THE PRINCIPLES</span></div><h2 className="why-heading reveal">WHY<br /><em>ARTEMIS?</em></h2><div className="principles">{[["01", "IDEAS FIRST."], ["02", "DESIGN WITH PURPOSE."], ["03", "BUILD WITHOUT LIMITS."]].map(([number, text]) => <div className="principle reveal" key={number}><span>{number}</span><strong>{text}</strong><ArrowUpRight size={19} /></div>)}</div></section>
 
-      <section className="social-hub section-lilac" id="social"><div className="section-top reveal"><span>07 / SOCIAL HUB</span><span>FOLLOW THE JOURNEY</span></div><div className="social-heading"><h2 className="editorial-title reveal">FOLLOW<br /><em>THE JOURNEY.</em></h2><p className="reveal">Behind the screens, inside the process, and out in the world.</p></div><div className="social-grid">{socials.map(({ label, handle, href, icon: Icon, color }) => <a href={href} target="_blank" rel="noreferrer" aria-label={`Open ${label}: ${handle}`} className={`social-tile ${color} reveal`} key={label}><Icon size={30} strokeWidth={1.6} /><span><b>{label}</b><small>{handle}</small></span><ArrowUpRight size={19} /></a>)}</div></section>
+      <section className="social-hub section-lilac" id="social"><div className="section-top reveal"><span>07 / SOCIAL HUB</span><span>FOLLOW THE JOURNEY</span></div><div className="social-heading"><h2 className="editorial-title reveal">FOLLOW<br /><em>THE JOURNEY.</em></h2><p className="reveal">Behind the screens, inside the process, and out in the world.</p></div><div className="social-grid">{socials.map(({ label, handle, href, icon: Icon, color }) => <a href={href} target="_blank" rel="noreferrer" aria-label={`Open ${label}: ${handle}`} className={`social-tile ${color} reveal`} key={label}><Icon size={30} strokeWidth={1.6} /><span><b>{label}</b><small>{handle}</small></span><ArrowUpRight size={19} /></a>)}</div><div className="whatsapp-grid">{whatsappContacts.map(({ label, handle, href, icon: Icon, color, qr }) => <a href={href} target="_blank" rel="noreferrer" aria-label={`Open ${label}: ${handle}`} className={`whatsapp-tile ${color} reveal`} key={label}>{qr && <img src="/manus-storage/shared_qr_code_f293e915.png" alt="WhatsApp QR code for Artemis Domain" />}<Icon size={25} strokeWidth={1.8} /><span><b>{label}</b><small>{handle}</small></span><ArrowUpRight size={18} /></a>)}</div></section>
 
       <section className="contact-cta" id="contact"><div className="cta-glow glow-one" /><div className="cta-glow glow-two" /><div className="cta-inner reveal"><span className="pill light"><Sparkles size={13} /> OPEN FOR COLLABORATION</span><h2>LET'S BUILD<br /><em>SOMETHING</em><br />UNFORGETTABLE.</h2><p>Have an idea, project, game, website, or creative concept? Let's turn it into something real.</p><a className="white-button" href="mailto:hello@artemisdomain.dev">START A PROJECT <ArrowUpRight size={17} /></a></div></section>
     </main>
 
-    <footer className="studio-footer"><div className="footer-top"><a href="#home" className="studio-logo"><span>✦</span> ARTEMIS DOMAIN</a><p>Creative technology<br />without limits.</p><div className="footer-links"><a href="#home">HOME</a><a href="#about">ABOUT</a><a href="#services">SERVICES</a><a href="#work">WORK</a><a href="#contact">CONTACT</a></div><div className="footer-socials">{socials.map(({ label, href, icon: Icon }) => <a href={href} target="_blank" rel="noreferrer" aria-label={label} key={label}><Icon size={17} /></a>)}</div></div><div className="footer-bottom"><span>© 2026 ARTEMIS DOMAIN</span><span>CREATIVE TECHNOLOGY / LAGOS, NG</span></div></footer>
+    <footer className="studio-footer"><div className="footer-top"><a href="#home" className="studio-logo"><span>✦</span> ARTEMIS DOMAIN</a><p>Creative technology<br />without limits.</p><div className="footer-links"><a href="#home">HOME</a><a href="#about">ABOUT</a><a href="#services">SERVICES</a><a href="#work">WORK</a><a href="#contact">CONTACT</a></div><div className="footer-socials">{socials.map(({ label, href, icon: Icon }) => <a href={href} target="_blank" rel="noreferrer" aria-label={label} key={label}><Icon size={17} /></a>)}{whatsappContacts.map(({ label, href }) => <a href={href} target="_blank" rel="noreferrer" aria-label={label} key={label}><MessageCircle size={17} /></a>)}</div></div><div className="footer-bottom"><span>© 2026 ARTEMIS DOMAIN</span><span>CREATIVE TECHNOLOGY / LAGOS, NG</span></div></footer>
   </div>;
 }
