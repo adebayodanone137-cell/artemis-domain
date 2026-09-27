@@ -62,7 +62,11 @@ function ServiceIcon({ icon: Icon, color }: { icon: typeof Monitor; color: strin
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">(() => window.localStorage.getItem("artemis-theme") === "dark" ? "dark" : "light");
+  const [theme, setTheme] = useState<"light" | "dark" | "auto">(() => {
+    const stored = window.localStorage.getItem("artemis-theme");
+    return stored === "dark" || stored === "auto" ? stored : "light";
+  });
+  const [systemDark, setSystemDark] = useState(false);
   useEffect(() => {
     const reveal = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add("is-visible")), { threshold: .12 });
     document.querySelectorAll(".reveal").forEach((element) => reveal.observe(element));
@@ -71,10 +75,18 @@ export default function Home() {
     return () => { reveal.disconnect(); window.removeEventListener("scroll", onScroll); };
   }, []);
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.style.colorScheme = theme;
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const updateSystemTheme = () => setSystemDark(media.matches);
+    updateSystemTheme();
+    media.addEventListener?.("change", updateSystemTheme);
+    return () => media.removeEventListener?.("change", updateSystemTheme);
+  }, []);
+  useEffect(() => {
+    const resolvedTheme = theme === "auto" ? (systemDark ? "dark" : "light") : theme;
+    document.documentElement.dataset.theme = resolvedTheme;
+    document.documentElement.style.colorScheme = resolvedTheme;
     window.localStorage.setItem("artemis-theme", theme);
-  }, [theme]);
+  }, [theme, systemDark]);
   const closeMenu = () => setMenuOpen(false);
 
   return <div className="studio-shell">
@@ -86,6 +98,7 @@ export default function Home() {
       <div className="theme-switch" role="group" aria-label="Choose color theme">
         <button type="button" className={theme === "light" ? "active" : ""} aria-pressed={theme === "light"} onClick={() => setTheme("light")}><Sun size={13} /> LIGHT</button>
         <button type="button" className={theme === "dark" ? "active" : ""} aria-pressed={theme === "dark"} onClick={() => setTheme("dark")}><Moon size={13} /> DARK</button>
+        <button type="button" className={theme === "auto" ? "active" : ""} aria-pressed={theme === "auto"} onClick={() => setTheme("auto")}><Monitor size={13} /> AUTO</button>
       </div>
       <a href="#contact" className="talk-button">LET'S TALK <ArrowUpRight size={14} /></a>
       <button className="mobile-toggle" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={19} /> : <Menu size={19} />}</button>
